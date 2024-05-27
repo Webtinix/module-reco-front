@@ -26,8 +26,81 @@
             </ul>
         </div>
         <div id="primary-tab-content">
-            <div class="hidden p-4 rounded-lg bg-white shadow-lg w-full h-screen" id="home-reco" role="tabpanel"
-                aria-labelledby="home-reco-tab">
+            <div class="hidden p-8 rounded-lg bg-white shadow-lg w-full h-screen overflow-y-auto" id="home-reco"
+                role="tabpanel" aria-labelledby="home-reco-tab">
+                <!--  -->
+
+                <section class="hidden zone_reco w-full" id="list-zone-reco">
+                    <div class="content-list-zone flex flex-wrap items-center w-full gap-4">
+                    </div>
+
+                </section>
+                <!-- focus zone reco -->
+                <section class="hidden zone_reco bg-white w-full shadow-lg" id="focus-reco">
+                    <form class="content-focus-zone flex flex-col w-full">
+                        <div
+                            class="header-zone-reco flex items-center w-full justify-between bg-[#98DFEF] text-[#1D7B8F] text-2xl font-medium">
+                            <div class="flex items-center gap-4 pl-6">
+                                <button class="come-back">
+                                    <img src="./icons/return.svg" alt="">
+                                </button>
+                                <span class="title_reco">Reco Homepage</span>
+                            </div>
+                            <button class="p-2 px-4 bg-[#FFC794]"> Sauvegarder</button>
+                        </div>
+                        <div
+                            class="settings-zone-reco grid grid-cols-2 items-end text-[#3F3F39] font-medium  p-4 px-16 w-full  gap-8">
+                            <div class="">
+                                <label for="name-zone-reco" class="block mb-2  ">Nom de
+                                    la
+                                    zone</label>
+                                <input type="text" id="name-zone-reco" name="name-zone-reco"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                                    placeholder="" required />
+                            </div>
+                            <div class="flex flex-col">
+                                <select name="select-page-apply" id="select-page-apply"
+                                    class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
+                                    <option value="">Choisissez sur quelle page l'appliquer</option>
+                                </select>
+                                <div class="w-full flex gap-2 flex-wrap" id="list-page-apply"></div>
+                                <input type="hidden" name="page-apply" id="page-apply">
+                            </div>
+                            <div class="">
+                                <label for="description-zone-reco" class="block mb-2">Décrivez votre
+                                    zone</label>
+                                <textarea id="description-zone-reco" name="description-zone-reco" rows="4"
+                                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
+                                    placeholder="...."></textarea>
+
+                            </div>
+                            <div class="col-span-2">
+                                <hr class="h-px my-4 bg-gray-200 border-0">
+                            </div>
+                        </div>
+                        <div class="config-zone-reco p-6 grid grid-cols-12 items-start">
+                            <div class="col-span-4 flex flex-col gap-4 items-start">
+                                <div class="flex items-start gap-8">
+                                    <div class="flex flex-col gap-4">
+                                        <button class="hidden"> <img src="./icons/moins.png" alt="plus"></button>
+                                        <button><img src="./icons/plus.png" alt="plus"></button>
+                                    </div>
+                                    <div class="">
+                                        <label for="name-zone-reco" class="block mb-2 text-[#1D7B8F] ">Critère</label>
+                                        <select name="" id=""
+                                            class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
+                                            <option value="">Ajouter un critère</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-span-8"></div>
+
+                        </div>
+                    </form>
+                </section>
+                <!--  -->
             </div>
         </div>
     </div>

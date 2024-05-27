@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@font-face {
+    font-family: 'Outfit';
+    src: url('./police/Outfit-Black.ttf') format('ttf'),
+        url('./police/Outfit-Bold.ttf') format('ttf'),
+        url('./police/Outfit-ExtraBold.ttf') format('ttf');
+    /* Vous pouvez ajouter d'autres styles de police ici, comme le poids (weight), la style (style) */
+}
+
+
+body {
+    color: #4D4D4D;
+    background-color: #FFFFFF;
+    font-family: 'Outfit', sans-serif;
+}
+
+h1,
+h2,
+h3 {
+    color: #1D7B8F;
+}
+
+h2 {
+    @apply text-2xl;
+}
+
+
+/* input */
+.input-text {
+    @apply block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus: ring-blue-500 focus:border-blue-500;
+}
+
+.input-select {
+    @apply block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6;
+}
+
+
+/* font */
+.wx_font {
+    font-family: 'Outfit', sans-serif;
+}
+
+
+.wx_bg_bloc {
+    background-color: #F6E5D6;
+    height: 4rem;
+    color: rgb(0, 0, 0);
+}
+
+.wx_tab_onglet_inactive {
+    color: #4D4D4D;
+    border-left: 1px solid #f7feff;
+}
+
+.wx_tab_onglet_inactive:hover {
+    color: #58A7B9;
+    border-left: 1px solid #f7feff;
+}
+
+
+.wx_tab_onglet_active {
+    background-color: #98DFEF;
+    border-top: 3px solid #1D7B8F;
+    color: #4D4D4D;
+    border-left: 1px solid #f7feff;
+}
+
+
+.blockConf_main {
+    background-color: #FFFFFF;
+}
+
+.blockConf_main:hover {
+    background-color: #F7FEFF;
+}

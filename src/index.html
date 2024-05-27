@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module Recommandation</title>
+    <link href="./css/output.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="p-8">
+        <div class="border-b border-gray-200 wx_bg_bloc w-fit">
+            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab"
+                data-tabs-toggle="#primary-tab-content" data-tabs-active-classes="wx_tab_onglet_active"
+                data-tabs-inactive-classes="wx_tab_onglet_inactive" role="tablist">
+                <li class="" role="presentation">
+                    <button class="flex items-center gap-4 p-4   " id="home-reco-tab" data-tabs-target="#home-reco"
+                        type="button" role="tab" aria-controls="home-reco" aria-selected="false">
+                        <img src="./icons/home.png" class="h-7" alt="home-reco">
+                        </span>
+                        <span class="text-xl">Home</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div id="primary-tab-content">
+            <div class="hidden p-4 rounded-lg bg-white shadow-lg w-full h-screen" id="home-reco" role="tabpanel"
+                aria-labelledby="home-reco-tab">
+            </div>
+        </div>
+    </div>
+    <script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>

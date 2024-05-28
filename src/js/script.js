@@ -265,7 +265,7 @@ function resetFocusZone() {
     id: 0,
     name: "Reco Home page",
     description: "Aperçu de la description de la zone",
-    zone_apply: [{ label: "test", value: 1 }],
+    zone_apply: [],
     criteres: [
       {
         id: 0,
@@ -329,6 +329,27 @@ $(document).on("click", ".btn_add_bloc_critere", function () {
 });
 $(document).on("click", ".btn_remove_bloc_critere", function () {
   removeBlockCritere($(this).data("index"));
+});
+$(document).on("change", "#select-page-apply", function () {
+  const value = $(this).val();
+
+  const obj = GLOBAL_CONFIG["list_zone_apply"].find(
+    (item) => item.value == value
+  );
+
+  if (obj) {
+    const new_zone_apply = [...CURRENT_ZONE_RECO["zone_apply"], obj];
+
+    CURRENT_ZONE_RECO["zone_apply"] = new_zone_apply;
+    const zoneForm = $("#content-focus-zone");
+    const pageApplyDiv = zoneForm?.find("#list-page-apply");
+    pageApplyDiv.empty();
+    CURRENT_ZONE_RECO.zone_apply?.map((item, index) => {
+      pageApplyDiv.append(cardPageApply(item));
+    });
+
+    $(this).val("");
+  }
 });
 
 function blockCritereZoneReco(data, count, index) {

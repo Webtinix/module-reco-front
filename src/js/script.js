@@ -1,4 +1,4 @@
-var GLOBAL_CONFIG = [];
+var GLOBAL_CONFIG_RECO = [];
 var CURRENT_ZONE_RECO = {};
 
 $(async function () {
@@ -78,7 +78,7 @@ async function getZoneReco(id) {
         },
       ],
     };
-    GLOBAL_CONFIG = zoneReco;
+    GLOBAL_CONFIG_RECO = zoneReco;
     return zoneReco["list_my_zone_reco"];
   }
 }
@@ -94,7 +94,7 @@ async function addNewZone() {
 async function editZoneReco(id) {
   if (id) {
     // on récupère l'élément dans la variable global et on modifie les blocs tout en ajouter des évènements
-    const data = GLOBAL_CONFIG["list_my_zone_reco"].find(
+    const data = GLOBAL_CONFIG_RECO["list_my_zone_reco"].find(
       (item) => item.id == id
     );
     if (data) {
@@ -102,17 +102,17 @@ async function editZoneReco(id) {
       CURRENT_ZONE_RECO = data;
       const zoneForm = $("#content-focus-zone");
       zoneForm?.find(".title_reco")?.text(data.name);
-      //les premiers champs du formulaire
+      //les premiers champs du formulaire (Name, desc, zone applicables)
       zoneForm?.find("#name-zone-reco")?.val(data.name);
       zoneForm?.find("#description-zone-reco")?.val(data.description);
-      //il faudrait charger le select des zones appliquable ici
+      //O charge le select des zones appliquable ici
       const selectPageApply = zoneForm?.find("#select-page-apply");
       selectPageApply.empty();
       const empty = $("<option>")
         .text("Choisissez sur quelle page l'appliquer")
         .val("");
       selectPageApply.append(empty);
-      GLOBAL_CONFIG["list_zone_apply"].map((option, index) => {
+      GLOBAL_CONFIG_RECO["list_zone_apply"].map((option, index) => {
         const newOption = $("<option>").text(option.label).val(option.value);
         selectPageApply.append(newOption);
       });
@@ -158,6 +158,7 @@ async function editZoneReco(id) {
           parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
         });
 
+      //on affiche la zone du formulaire après avoir bien chargé les bonnes données
       visibilityBlock("focus-reco");
     }
   }
@@ -252,7 +253,7 @@ function cardPageApply(data) {
   const { label, value } = data;
   const card = `
    <div class="px-4 p-1 flex items-center gap-2 bg-[#1D7B8F] rounded">
-      <button>x</button>
+      <button class="item-zone-apply" data-id_zone="${value}">x</button>
       <span>${label}</span>
   </div>
   `;
@@ -261,6 +262,7 @@ function cardPageApply(data) {
 }
 
 function resetFocusZone() {
+  //on fait un reset de la zone du formulaire avec des valeurs par défauts
   CURRENT_ZONE_RECO = {
     id: 0,
     name: "Reco Home page",
@@ -288,7 +290,7 @@ function resetFocusZone() {
     .text("Choisissez sur quelle page l'appliquer")
     .val("");
   selectPageApply.append(empty);
-  GLOBAL_CONFIG["list_zone_apply"].map((option, index) => {
+  GLOBAL_CONFIG_RECO["list_zone_apply"].map((option, index) => {
     const newOption = $("<option>").text(option.label).val(option.value);
     selectPageApply.append(newOption);
   });
@@ -325,21 +327,40 @@ function resetFocusZone() {
 }
 
 $(document).on("click", ".btn_add_bloc_critere", function () {
+  //ajouter un block critère
   addNewBlockCritere($(this).data("index"));
 });
 $(document).on("click", ".btn_remove_bloc_critere", function () {
+  //retirer un block critère
   removeBlockCritere($(this).data("index"));
 });
+
+$(document).on("click", ".item-zone-apply", function () {
+  //event pour retirer des zones appliquée
+  const value = $(this).data("id_zone");
+
+  const listZoneApply = [...CURRENT_ZONE_RECO["zone_apply"]].filter(
+    (item) => item.value != value
+  );
+  CURRENT_ZONE_RECO["zone_apply"] = listZoneApply;
+  //
+  const zoneForm = $("#content-focus-zone");
+  const pageApplyDiv = zoneForm?.find("#list-page-apply");
+  pageApplyDiv.empty();
+  CURRENT_ZONE_RECO.zone_apply?.map((item, index) => {
+    pageApplyDiv.append(cardPageApply(item));
+  });
+});
+
 $(document).on("change", "#select-page-apply", function () {
+  //event pour le select des zones applicables
   const value = $(this).val();
 
-  const obj = GLOBAL_CONFIG["list_zone_apply"].find(
+  const obj = GLOBAL_CONFIG_RECO["list_zone_apply"].find(
     (item) => item.value == value
   );
-
   if (obj) {
     const new_zone_apply = [...CURRENT_ZONE_RECO["zone_apply"], obj];
-
     CURRENT_ZONE_RECO["zone_apply"] = new_zone_apply;
     const zoneForm = $("#content-focus-zone");
     const pageApplyDiv = zoneForm?.find("#list-page-apply");
@@ -355,16 +376,16 @@ $(document).on("change", "#select-page-apply", function () {
 function blockCritereZoneReco(data, count, index) {
   const { id, enabled, critere_value } = data;
 
+  const btnMoinsIsVisible = count > 1 ? "" : "hidden";
+
   const critere = `
    <div class="block-critere-zone-reco grid grid-cols-12 items-center" critere-index="${id}">
         <div class="col-span-4 flex gap-8 items-center w-full">
             <div class="flex flex-col gap-4">
                 <button 
                 data-index="${index}"
-                class="btn_remove_bloc_critere"
-                class="${
-                  count > 1 ? "" : "hidden"
-                }"> <img src="./icons/moins.png" alt="moins"></button>
+                class="btn_remove_bloc_critere ${btnMoinsIsVisible}"
+                > <img src="./icons/moins.png" alt="moins"></button>
                 <button type="buttton" data-index="${index}" class="btn_add_bloc_critere"><img src="./icons/plus.png" alt="plus"></button>
             </div>
             <label class="inline-flex items-center mb-5 cursor-pointer">
@@ -384,7 +405,7 @@ function blockCritereZoneReco(data, count, index) {
                     class="select-critere bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
                     <option value="">Ajouter un critère</option>
                     ${optionSelect(
-                      GLOBAL_CONFIG["list_critere"],
+                      GLOBAL_CONFIG_RECO["list_critere"],
                       critere_value
                     )}
                 </select>
@@ -393,7 +414,7 @@ function blockCritereZoneReco(data, count, index) {
         <div class="dynamiqueBlock col-span-8">
         ${blockDynamique(data)}
         </div>
-        <div class="col-span-12 ${count > 1 ? "" : "hidden"}">
+        <div class="col-span-12 ${index != count - 1 ? "" : "hidden"}">
             <hr class="h-px my-4 bg-gray-200 border-0">
         </div>
     </div>
@@ -540,7 +561,7 @@ function blockDynamique(data) {
                       class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Choisir parmi les opérateurs</option>
                     ${optionSelect(
-                      GLOBAL_CONFIG["list_operateur"],
+                      GLOBAL_CONFIG_RECO["list_operateur"],
                       operateur_value
                     )}
                   </select>
@@ -571,7 +592,7 @@ function blockDynamique(data) {
                     class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Choisir parmi les opérateurs</option>
                     ${optionSelect(
-                      GLOBAL_CONFIG["list_operateur"],
+                      GLOBAL_CONFIG_RECO["list_operateur"],
                       operateur_value
                     )}
                 </select>
@@ -615,7 +636,10 @@ function blockDynamique(data) {
           <select
               class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
               <option value="">Choisir parmi les opérateurs</option>
-              ${optionSelect(GLOBAL_CONFIG["list_operateur"], operateur_value)}
+              ${optionSelect(
+                GLOBAL_CONFIG_RECO["list_operateur"],
+                operateur_value
+              )}
           </select>
       </div>
       <div>
@@ -624,7 +648,7 @@ function blockDynamique(data) {
               class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           <option value="">Choisir parmi les opérateurs</option>
               ${optionSelect(
-                GLOBAL_CONFIG["list_operateur"],
+                GLOBAL_CONFIG_RECO["list_operateur"],
                 operateur_value_inf
               )}
           </select>

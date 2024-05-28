@@ -26,7 +26,7 @@
             </ul>
         </div>
         <div id="primary-tab-content">
-            <div class="hidden p-8 rounded-lg bg-white shadow-lg w-full h-screen overflow-y-auto" id="home-reco"
+            <div class="hidden p-8 rounded-lg bg-white shadow-lg w-full h-full overflow-y-auto" id="home-reco"
                 role="tabpanel" aria-labelledby="home-reco-tab">
                 <!--  -->
 
@@ -37,7 +37,7 @@
                 </section>
                 <!-- focus zone reco -->
                 <section class="hidden zone_reco bg-white w-full shadow-lg" id="focus-reco">
-                    <form class="content-focus-zone flex flex-col w-full" id="content-focus-zone">
+                    <div class="content-focus-zone flex flex-col w-full" id="content-focus-zone">
                         <div
                             class="header-zone-reco flex items-center w-full justify-between bg-[#98DFEF] text-[#1D7B8F] text-2xl font-medium">
                             <div class="flex items-center gap-4 pl-6">
@@ -49,7 +49,7 @@
                             <button class="p-2 px-4 bg-[#FFC794]"> Sauvegarder</button>
                         </div>
                         <div
-                            class="settings-zone-reco grid grid-cols-2 items-end text-[#3F3F39] font-medium  p-4 px-16 w-full  gap-8">
+                            class="settings-zone-reco grid grid-cols-2 items-center text-[#3F3F39] font-medium  p-4 px-16 w-full  gap-8">
                             <div class="">
                                 <label for="name-zone-reco" class="block mb-2 ">Nom de
                                     la
@@ -58,13 +58,12 @@
                                     class="bg-gray-50 border border-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
                                     placeholder="" required />
                             </div>
-                            <div class="flex flex-col">
+                            <div class="flex flex-col pt-10">
                                 <select name="select-page-apply" id="select-page-apply"
                                     class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
                                     <option value="">Choisissez sur quelle page l'appliquer</option>
                                 </select>
                                 <div class="w-full flex gap-2 flex-wrap text-white my-2" id="list-page-apply">
-
                                 </div>
                                 <input type="hidden" name="page-apply" id="page-apply">
                             </div>
@@ -103,40 +102,11 @@
                                     </div>
                                 </div>
                                 <div class="dynamiqueBlock col-span-8">
-                                    <div class="items-center grid grid-cols-8 gap-4">
-                                        <!-- conditions -->
-                                        <div class=" col-span-2 w-full">
-                                            <div>
-                                                <label for="country" class="block  leading-6">Oérateurs</label>
-                                                <select
-                                                    class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
 
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <!-- input value -->
-                                        <div class="col-span-4  w-full">
-                                            <label for="search" class="block  leading-6">Valeurs</label>
-                                            <div class="relative">
-                                                <input type="search" id="search" placeholder="Saisir une valeur"
-                                                    class="value block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                                                <button type="button"
-                                                    class=" absolute right-0 bottom-0.5 bg-[#98DFEF] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 ">
-                                                    <svg class="w-4 h-4" aria-hidden=" true"
-                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 20 20">
-                                                        <path stroke="currentColor" stroke-linecap="round"
-                                                            stroke-linejoin="round" stroke-width="2"
-                                                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </section>
                 <!--  -->
             </div>

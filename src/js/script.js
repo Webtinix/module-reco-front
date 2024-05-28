@@ -1,4 +1,5 @@
 var GLOBAL_CONFIG = [];
+var CURRENT_ZONE_RECO = {};
 
 $(async function () {
   /* Chargement des tabs principale */
@@ -21,8 +22,8 @@ async function initialize() {
   const blockListZoneReco = $("#list-zone-reco");
   blockListZoneReco?.data("list_reco", listReco);
   resetFocusZone();
-  //visibilityBlock("list-zone-reco"); // remettre celui ci c'est le bon
-  visibilityBlock("focus-reco");
+  visibilityBlock("list-zone-reco"); // remettre celui ci c'est le bon
+  // visibilityBlock("focus-reco");
 
   if (listReco.length > 0) {
     //blockListZoneReco.a
@@ -69,8 +70,8 @@ async function getZoneReco(id) {
               id: 1,
               enabled: true,
               value: "test",
-              critere_value: 12,
-              operateur_value: "",
+              critere_value: "Meilleures ventes",
+              operateur_value: ">",
               operateur_value_inf: "",
             },
           ],
@@ -91,13 +92,14 @@ async function addNewZone() {
 
 //modifier une zone reco
 async function editZoneReco(id) {
-
   if (id) {
     // on récupère l'élément dans la variable global et on modifie les blocs tout en ajouter des évènements
     const data = GLOBAL_CONFIG["list_my_zone_reco"].find(
       (item) => item.id == id
     );
     if (data) {
+      //on met les data de la zone reco en focus ici ça nous aidera bien
+      CURRENT_ZONE_RECO = data;
       const zoneForm = $("#content-focus-zone");
       zoneForm?.find(".title_reco")?.text(data.name);
       //les premiers champs du formulaire
@@ -121,7 +123,8 @@ async function editZoneReco(id) {
       data.zone_apply?.map((item, index) => {
         pageApplyDiv.append(cardPageApply(item));
       });
-      //les autres champs interactifs
+
+      //les autres champs interactifs (bock critere)
       const configsFields = zoneForm.find(".config-zone-reco");
       configsFields.empty();
       data["criteres"].map((critere, index) => {
@@ -139,9 +142,9 @@ async function editZoneReco(id) {
         .off("change")
         .on("change", function (event) {
           const selectedValue = event.target.value;
-          const dataBlocCritere = data["criteres"]?.find(
-            (item) => item.id == $(this).attr("critere-id")
-          ) ?? {
+          const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
+            $(this).attr("critere-index")
+          ] ?? {
             critere_value: selectedValue,
             enabled: true,
           };
@@ -258,6 +261,22 @@ function cardPageApply(data) {
 }
 
 function resetFocusZone() {
+  CURRENT_ZONE_RECO = {
+    id: 0,
+    name: "Reco Home page",
+    description: "Aperçu de la description de la zone",
+    zone_apply: [{ label: "test", value: 1 }],
+    criteres: [
+      {
+        id: 0,
+        enabled: true,
+        value: "",
+        critere_value: "",
+        operateur_value: "",
+        operateur_value_inf: "",
+      },
+    ],
+  };
   const zoneForm = $("#content-focus-zone");
   zoneForm.find(".title_reco").text("Zone Reco");
   zoneForm.find("select, input, textarea").val("");
@@ -277,8 +296,8 @@ function resetFocusZone() {
   const configsFields = zoneForm.find(".config-zone-reco");
   configsFields.empty();
   const blockCritere = blockCritereZoneReco(
-    { critere_value: "", enabled: false },
-    0,
+    CURRENT_ZONE_RECO["criteres"][0],
+    1,
     0
   );
   configsFields.append(blockCritere);
@@ -288,30 +307,44 @@ function resetFocusZone() {
     .off("change")
     .on("change", function (event) {
       const selectedValue = event.target.value;
-      // const id = $(this).attr("critere-id");
-      const newDynamiqueBlock = blockDynamique({
+      const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
+        $(this).attr("critere-index")
+      ] ?? {
         critere_value: selectedValue,
         enabled: true,
-      });
+      };
+      const dataDiluer = {
+        ...dataBlocCritere,
+        critere_value: selectedValue,
+      };
+      const newDynamiqueBlock = blockDynamique(dataDiluer);
       const parents = $(this).parents(".block-critere-zone-reco");
       parents.find(".dynamiqueBlock")?.empty();
       parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
     });
 }
 
+$(document).on("click", ".btn_add_bloc_critere", function () {
+  addNewBlockCritere($(this).data("index"));
+});
+$(document).on("click", ".btn_remove_bloc_critere", function () {
+  removeBlockCritere($(this).data("index"));
+});
+
 function blockCritereZoneReco(data, count, index) {
   const { id, enabled, critere_value } = data;
 
   const critere = `
-   <div class="block-critere-zone-reco grid grid-cols-12 items-center" critere-id="${id}">
+   <div class="block-critere-zone-reco grid grid-cols-12 items-center" critere-index="${id}">
         <div class="col-span-4 flex gap-8 items-center w-full">
             <div class="flex flex-col gap-4">
                 <button 
-                onclick="removeCritere(${id})
+                data-index="${index}"
+                class="btn_remove_bloc_critere"
                 class="${
                   count > 1 ? "" : "hidden"
                 }"> <img src="./icons/moins.png" alt="moins"></button>
-                <button onclick="addCritere(${index})"><img src="./icons/plus.png" alt="plus"></button>
+                <button type="buttton" data-index="${index}" class="btn_add_bloc_critere"><img src="./icons/plus.png" alt="plus"></button>
             </div>
             <label class="inline-flex items-center mb-5 cursor-pointer">
                 <input type="checkbox" value="" name="isActiveBlock_"
@@ -325,7 +358,7 @@ function blockCritereZoneReco(data, count, index) {
             <div class="">
                 <label for="select-critere" class="block mb-2 text-[#1D7B8F] ">Critère</label>
                 <select 
-                    critere-id="${id}"
+                    critere-index="${id}"
                     name="select-critere" id=""
                     class="select-critere bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
                     <option value="">Ajouter un critère</option>
@@ -347,8 +380,95 @@ function blockCritereZoneReco(data, count, index) {
   return critere;
 }
 
-function addCritere(index) {}
-function removeCritere(id) {}
+function addNewBlockCritere(index) {
+  console.log("in add", index);
+  if (index == 0 || index) {
+    console.log("aaa");
+    const listCritere = [...CURRENT_ZONE_RECO["criteres"]];
+    const newElement = { ...listCritere[index], id: 0 };
+    listCritere.splice(index + 1, 0, newElement);
+
+    //on met à jour la variable global
+    CURRENT_ZONE_RECO["criteres"] = [...listCritere];
+
+    //on reinit le block des crites
+    const zoneForm = $("#content-focus-zone");
+    const configsFields = zoneForm.find(".config-zone-reco");
+    configsFields.empty();
+    CURRENT_ZONE_RECO["criteres"].map((critere, index) => {
+      const blockCritere = blockCritereZoneReco(
+        critere,
+        CURRENT_ZONE_RECO["criteres"].length,
+        index
+      );
+      configsFields.append(blockCritere);
+    });
+    //on met un évènement sur les selects critères
+    zoneForm
+      .find(".select-critere")
+      .off("change")
+      .on("change", function (event) {
+        const selectedValue = event.target.value;
+        const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
+          $(this).attr("critere-index")
+        ] ?? {
+          critere_value: selectedValue,
+          enabled: true,
+        };
+        const dataDiluer = {
+          ...dataBlocCritere,
+          critere_value: selectedValue,
+        };
+        const newDynamiqueBlock = blockDynamique(dataDiluer);
+        const parents = $(this).parents(".block-critere-zone-reco");
+        parents.find(".dynamiqueBlock")?.empty();
+        parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
+      });
+  }
+}
+function removeBlockCritere(index) {
+  if (index == 0 || index) {
+    const listCritere = [...CURRENT_ZONE_RECO["criteres"]];
+    listCritere.splice(index, 1);
+
+    //on met à jour la variable gloale
+    CURRENT_ZONE_RECO["criteres"] = [...listCritere];
+
+    //on reinit le block des crites
+    const zoneForm = $("#content-focus-zone");
+    const configsFields = zoneForm.find(".config-zone-reco");
+    configsFields.empty();
+    CURRENT_ZONE_RECO["criteres"].map((critere, index) => {
+      const blockCritere = blockCritereZoneReco(
+        critere,
+        CURRENT_ZONE_RECO["criteres"].length,
+        index
+      );
+      configsFields.append(blockCritere);
+    });
+    //on met un évènement sur les selects critères
+    zoneForm
+      .find(".select-critere")
+      .off("change")
+      .on("change", function (event) {
+        const selectedValue = event.target.value;
+        const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
+          $(this).attr("critere-index")
+        ] ?? {
+          critere_value: selectedValue,
+          enabled: true,
+        };
+        const dataDiluer = {
+          ...dataBlocCritere,
+          critere_value: selectedValue,
+        };
+        const newDynamiqueBlock = blockDynamique(dataDiluer);
+        const parents = $(this).parents(".block-critere-zone-reco");
+        parents.find(".dynamiqueBlock")?.empty();
+        parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
+      });
+  }
+}
 
 function optionSelect(list, valueSelected) {
   // return all critere for select
@@ -516,7 +636,6 @@ function blockDynamique(data) {
       `;
     default:
       return `
-      
       `;
   }
 }

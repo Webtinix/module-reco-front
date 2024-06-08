@@ -69,7 +69,7 @@ async function getZoneReco(id) {
             {
               id: 1,
               enabled: true,
-              value: "test",
+              valeurs: "test",
               critere_value: "Meilleures ventes",
               operateur_value: ">",
               operateur_value_inf: "",
@@ -136,28 +136,6 @@ async function editZoneReco(id) {
         configsFields.append(blockCritere);
       });
 
-      //on met un évènement sur les selects critères
-      zoneForm
-        .find(".select-critere")
-        .off("change")
-        .on("change", function (event) {
-          const selectedValue = event.target.value;
-          const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
-            $(this).attr("critere-index")
-          ] ?? {
-            critere_value: selectedValue,
-            enabled: true,
-          };
-          const dataDiluer = {
-            ...dataBlocCritere,
-            critere_value: selectedValue,
-          };
-          const newDynamiqueBlock = blockDynamique(dataDiluer);
-          const parents = $(this).parents(".block-critere-zone-reco");
-          parents.find(".dynamiqueBlock")?.empty();
-          parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
-        });
-
       //on affiche la zone du formulaire après avoir bien chargé les bonnes données
       visibilityBlock("focus-reco");
     }
@@ -167,6 +145,12 @@ async function editZoneReco(id) {
 //supprimer une zone reco
 async function deleteZoneReco(id) {
   if (id) {
+    const index = GLOBAL_CONFIG_RECO["list_my_zone_reco"].findIndex(
+      (zone) => zone.id === id
+    );
+    if (index !== -1) {
+      GLOBAL_CONFIG_RECO["list_my_zone_reco"].splice(index, 1);
+    }
   }
 }
 
@@ -265,14 +249,14 @@ function resetFocusZone() {
   //on fait un reset de la zone du formulaire avec des valeurs par défauts
   CURRENT_ZONE_RECO = {
     id: 0,
-    name: "Reco Home page",
+    name: "Reco page",
     description: "Aperçu de la description de la zone",
     zone_apply: [],
     criteres: [
       {
         id: 0,
         enabled: true,
-        value: "",
+        valeurs: "",
         critere_value: "",
         operateur_value: "",
         operateur_value_inf: "",
@@ -303,27 +287,6 @@ function resetFocusZone() {
     0
   );
   configsFields.append(blockCritere);
-
-  zoneForm
-    .find(".select-critere")
-    .off("change")
-    .on("change", function (event) {
-      const selectedValue = event.target.value;
-      const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
-        $(this).attr("critere-index")
-      ] ?? {
-        critere_value: selectedValue,
-        enabled: true,
-      };
-      const dataDiluer = {
-        ...dataBlocCritere,
-        critere_value: selectedValue,
-      };
-      const newDynamiqueBlock = blockDynamique(dataDiluer);
-      const parents = $(this).parents(".block-critere-zone-reco");
-      parents.find(".dynamiqueBlock")?.empty();
-      parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
-    });
 }
 
 $(document).on("click", ".btn_add_bloc_critere", function () {
@@ -373,6 +336,97 @@ $(document).on("change", "#select-page-apply", function () {
   }
 });
 
+$(document).on("change", ".isActiveBlock_", function () {
+  const index = $(this)
+    .closest(".block-critere-zone-reco")
+    .attr("critere-index");
+  const isChecked = $(this).is(":checked");
+
+  // Mettre à jour l'état activé du critère dans la configuration actuelle
+  const critere = CURRENT_ZONE_RECO["criteres"].find(
+    (crit) => crit.id == index
+  );
+  if (critere) {
+    critere.enabled = isChecked;
+  }
+  // Optionnel: Ajouter une logique visuelle pour indiquer l'état activé/désactivé
+  // $(this).closest('.block-critere-zone-reco').toggleClass('disabled', !isChecked);
+});
+
+$(document).on("change", ".operateur_value_inf", function (event) {
+  const selectedValue = event.target.value;
+  const index = $(this)
+    .closest(".block-critere-zone-reco")
+    .attr("critere-index");
+  // console.log("index select", index);
+  if (index) {
+    const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][index];
+    const dataDiluer = {
+      ...dataBlocCritere,
+      operateur_value_inf: selectedValue,
+    };
+    CURRENT_ZONE_RECO["criteres"][index] = dataDiluer;
+  }
+});
+
+$(document).on("change", ".operateur_value", function (event) {
+  const selectedValue = event.target.value;
+  const index = $(this)
+    .closest(".block-critere-zone-reco")
+    .attr("critere-index");
+  // console.log("index select", index);
+  if (index) {
+    const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][index];
+    const dataDiluer = {
+      ...dataBlocCritere,
+      operateur_value: selectedValue,
+    };
+    CURRENT_ZONE_RECO["criteres"][index] = dataDiluer;
+  }
+});
+
+$(document).on("keyup", ".valeurs", function () {
+  const val = $(this).val();
+  const index = $(this)
+    .closest(".block-critere-zone-reco")
+    .attr("critere-index");
+  // console.log("index select", index);
+  if (index) {
+    const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][index];
+    const dataDiluer = {
+      ...dataBlocCritere,
+      valeurs: val,
+    };
+    CURRENT_ZONE_RECO["criteres"][index] = dataDiluer;
+  }
+});
+
+$(document).on("keyup", ".name-zone-reco", function () {
+  const val = $(this).val();
+  CURRENT_ZONE_RECO.name = val;
+});
+
+$(document).on("keyup", ".description-zone-reco", function () {
+  const val = $(this).val();
+  CURRENT_ZONE_RECO.description = val;
+});
+
+$(document).on("click", "#save-zone-reco", function () {
+  if (CURRENT_ZONE_RECO.id == 0) {
+    //il faudrait mettre à jour le nouvel id normalement
+    GLOBAL_CONFIG_RECO["list_zone_reco"].push(CURRENT_ZONE_RECO);
+  } else {
+    const zoneIndex = GLOBAL_CONFIG_RECO["list_zone_reco"].findIndex(
+      (zone) => zone.id === CURRENT_ZONE_RECO.id
+    );
+    if (zoneIndex !== -1) {
+      GLOBAL_CONFIG_RECO["list_zone_reco"][zoneIndex] = CURRENT_ZONE_RECO;
+    }
+  }
+
+  $(".come-back").trigger("click");
+});
+
 function blockCritereZoneReco(data, count, index) {
   const { id, enabled, critere_value } = data;
 
@@ -400,7 +454,7 @@ function blockCritereZoneReco(data, count, index) {
             <div class="">
                 <label for="select-critere" class="block mb-2 text-[#1D7B8F] ">Critère</label>
                 <select 
-                    critere-index="${id}"
+                    critere-index="${index}"
                     name="select-critere" id=""
                     class="select-critere bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5">
                     <option value="">Ajouter un critère</option>
@@ -425,8 +479,8 @@ function blockCritereZoneReco(data, count, index) {
 function addNewBlockCritere(index) {
   console.log("in add", index);
   if (index == 0 || index) {
-    console.log("aaa");
     const listCritere = [...CURRENT_ZONE_RECO["criteres"]];
+
     const newElement = { ...listCritere[index], id: 0 };
     listCritere.splice(index + 1, 0, newElement);
 
@@ -437,35 +491,14 @@ function addNewBlockCritere(index) {
     const zoneForm = $("#content-focus-zone");
     const configsFields = zoneForm.find(".config-zone-reco");
     configsFields.empty();
-    CURRENT_ZONE_RECO["criteres"].map((critere, index) => {
+    listCritere.map((critere, index) => {
       const blockCritere = blockCritereZoneReco(
         critere,
-        CURRENT_ZONE_RECO["criteres"].length,
+        listCritere.length,
         index
       );
       configsFields.append(blockCritere);
     });
-    //on met un évènement sur les selects critères
-    zoneForm
-      .find(".select-critere")
-      .off("change")
-      .on("change", function (event) {
-        const selectedValue = event.target.value;
-        const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
-          $(this).attr("critere-index")
-        ] ?? {
-          critere_value: selectedValue,
-          enabled: true,
-        };
-        const dataDiluer = {
-          ...dataBlocCritere,
-          critere_value: selectedValue,
-        };
-        const newDynamiqueBlock = blockDynamique(dataDiluer);
-        const parents = $(this).parents(".block-critere-zone-reco");
-        parents.find(".dynamiqueBlock")?.empty();
-        parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
-      });
   }
 }
 function removeBlockCritere(index) {
@@ -488,27 +521,6 @@ function removeBlockCritere(index) {
       );
       configsFields.append(blockCritere);
     });
-    //on met un évènement sur les selects critères
-    zoneForm
-      .find(".select-critere")
-      .off("change")
-      .on("change", function (event) {
-        const selectedValue = event.target.value;
-        const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][
-          $(this).attr("critere-index")
-        ] ?? {
-          critere_value: selectedValue,
-          enabled: true,
-        };
-        const dataDiluer = {
-          ...dataBlocCritere,
-          critere_value: selectedValue,
-        };
-        const newDynamiqueBlock = blockDynamique(dataDiluer);
-        const parents = $(this).parents(".block-critere-zone-reco");
-        parents.find(".dynamiqueBlock")?.empty();
-        parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
-      });
   }
 }
 
@@ -535,7 +547,7 @@ function blockDynamique(data) {
   // operateur_value_inf celui du 2èeme select opérateur sinon pas besoin
   // value répresente la valeur du champs de saisi à chaque fois
 
-  const { critere_value, operateur_value, operateur_value_inf, value } = data;
+  const { critere_value, operateur_value, operateur_value_inf, valeurs } = data;
 
   switch (critere_value) {
     case "Meilleures ventes":
@@ -558,7 +570,7 @@ function blockDynamique(data) {
               <div>
                   <label for="country" class="block  leading-6">Oérateurs</label>
                   <select
-                      class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      class="operateur_value block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Choisir parmi les opérateurs</option>
                     ${optionSelect(
                       GLOBAL_CONFIG_RECO["list_operateur"],
@@ -574,9 +586,9 @@ function blockDynamique(data) {
                       valeurs
                   </label>
                   <input
-                      value="${value ?? ""}"
-                      placeholder="Saisir la note" type="text" name="value"
-                      class="value block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      value="${valeurs ?? ""}"
+                      placeholder="Saisir la note" type="text" name="valeurs"
+                      class="valeurs block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
               </div>
           </div>
       </div>
@@ -589,7 +601,7 @@ function blockDynamique(data) {
             <div>
                 <label for="country" class="block  leading-6">Oérateurs</label>
                 <select
-                    class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                    class="operateur_value block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
                     <option value="">Choisir parmi les opérateurs</option>
                     ${optionSelect(
                       GLOBAL_CONFIG_RECO["list_operateur"],
@@ -603,9 +615,9 @@ function blockDynamique(data) {
             <label for="search" class="block  leading-6">Valeurs</label>
             <div class="relative">
                 <input value="${
-                  value ?? ""
-                }" type="search" id="search" placeholder="Saisir une valeur" name="value" 
-                    class="value block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                  valeurs ?? ""
+                }" type="search" id="search" placeholder="Saisir une valeur" name="valeurs" 
+                    class="valeurs block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                 <button type="button"
                     class=" absolute right-0 bottom-0.5 bg-[#98DFEF] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 ">
                     <svg class="w-4 h-4" aria-hidden=" true"
@@ -634,7 +646,7 @@ function blockDynamique(data) {
       <div>
           <label for="country" class="block  leading-6">Opérateurs</label>
           <select
-              class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              class="operateur_value block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
               <option value="">Choisir parmi les opérateurs</option>
               ${optionSelect(
                 GLOBAL_CONFIG_RECO["list_operateur"],
@@ -645,7 +657,7 @@ function blockDynamique(data) {
       <div>
           <label for="country" class=" block   leading-6">Opérateurs</label>
           <select
-              class="conditions_select_ block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+              class="operateur_value_inf block w-full rounded-md border-0 px-3.5 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           <option value="">Choisir parmi les opérateurs</option>
               ${optionSelect(
                 GLOBAL_CONFIG_RECO["list_operateur"],
@@ -672,9 +684,9 @@ function blockDynamique(data) {
               valeurs
           </label>
           <input value="${
-            value ?? ""
-          }" placeholder="Saisir la note" type="text" name="value"
-              class="value block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            valeurs ?? ""
+          }" placeholder="Saisir la note" type="text" name="valeurs"
+              class="valeurs block w-full rounded-md border-0 px-3.5 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
       </div>
   </div>
   </div>

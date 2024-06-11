@@ -12,13 +12,15 @@ function comeBack() {
 }
 
 //fonction init
-async function initialize() {
+async function initialize(newList = []) {
   /*
    * On récupère tous les cards recommandation pour les afficher
    * On passe le block list-zone-reco à visibile pour affichers les zonezs reco récupérer ou le button ajouter une première zone reco
    */
 
-  const listReco = await getZoneReco();
+  console.log({ newList });
+
+  const listReco = newList.length > 0 ? newList : await getZoneReco();
   const blockListZoneReco = $("#list-zone-reco");
   blockListZoneReco?.data("list_reco", listReco);
   resetFocusZone();
@@ -28,6 +30,7 @@ async function initialize() {
   if (listReco.length > 0) {
     //blockListZoneReco.a
     const content = blockListZoneReco.find(".content-list-zone");
+    content.empty();
     listReco.map((data) => content?.append(cardZone(data)));
     content.append(addButton());
   } else {
@@ -171,6 +174,7 @@ async function visibilityBlock(toVisible) {
         $element.removeClass("hidden");
         if (toVisible == "focus-reco") {
           $(".header-zone-reco")?.find(".come-back")?.on("click", comeBack);
+        } else {
         }
       } else {
         $element.addClass("hidden");
@@ -433,14 +437,11 @@ $(document).on("keyup", ".description-zone-reco", function () {
 
 $(document).on("click", "#save-zone-reco", function (e) {
   e.preventDefault();
-  console.log({ CURRENT_ZONE_RECO, GLOBAL_CONFIG_RECO });
   if (CURRENT_ZONE_RECO.id == 0) {
     //il faudrait mettre à jour le nouvel id normalement
     const list = [...GLOBAL_CONFIG_RECO["list_my_zone_reco"]];
-
+    CURRENT_ZONE_RECO.id = list.length + 1;
     GLOBAL_CONFIG_RECO["list_my_zone_reco"] = [...list, CURRENT_ZONE_RECO];
-
-    console.log({ GLOBAL_CONFIG_RECO });
   } else {
     const zoneIndex = GLOBAL_CONFIG_RECO["list_my_zone_reco"].findIndex(
       (zone) => zone.id === CURRENT_ZONE_RECO.id
@@ -450,7 +451,7 @@ $(document).on("click", "#save-zone-reco", function (e) {
     }
   }
 
-  $(".come-back").trigger("click");
+  initialize(GLOBAL_CONFIG_RECO["list_my_zone_reco"] ?? []);
 });
 
 function blockCritereZoneReco(data, count, index) {

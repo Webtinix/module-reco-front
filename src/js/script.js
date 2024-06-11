@@ -18,12 +18,10 @@ async function initialize(newList = []) {
    * On passe le block list-zone-reco à visibile pour affichers les zonezs reco récupérer ou le button ajouter une première zone reco
    */
 
-  console.log({ newList });
-
   const listReco = newList.length > 0 ? newList : await getZoneReco();
   const blockListZoneReco = $("#list-zone-reco");
   blockListZoneReco?.data("list_reco", listReco);
-  resetFocusZone();
+  // resetFocusZone();
   visibilityBlock("list-zone-reco"); // remettre celui ci c'est le bon
   // visibilityBlock("focus-reco");
 
@@ -148,11 +146,12 @@ async function editZoneReco(id) {
 //supprimer une zone reco
 async function deleteZoneReco(id) {
   if (id) {
-    const index = GLOBAL_CONFIG_RECO["list_my_zone_reco"].findIndex(
-      (zone) => zone.id === id
-    );
+    const list = [...GLOBAL_CONFIG_RECO["list_my_zone_reco"]];
+    const index = list.findIndex((zone) => zone.id === id);
     if (index !== -1) {
-      GLOBAL_CONFIG_RECO["list_my_zone_reco"].splice(index, 1);
+      list.splice(index, 1);
+      GLOBAL_CONFIG_RECO["list_my_zone_reco"] = list;
+      initialize(list);
     }
   }
 }
@@ -219,8 +218,8 @@ function cardZone(data) {
                       <div
                             data-zone-id="${id}"
                             class="card_zone_reco w-52 h-[14rem] max-w-sm p-6 gap-4 flex flex-col items-center justify-center text-center bg-white border border-gray-200 rounded-lg shadow">
-                            <span class="text-2xl text-[#1D7B8F] text-center font-bold">Reco Home page</span>
-                            <p>Aperçu de la description de la zone</p>
+                            <span class="text-2xl text-[#1D7B8F] text-center font-bold">${name}</span>
+                            <p>${description}</p>
                             <div class="flex w-full justify-center items-center gap-4">
                                 <button class="edit-card-reco" onclick="editZoneReco(${id})">
                                     <img src="./icons/crayon.png" alt="edit" class="h-10">
@@ -253,8 +252,8 @@ function resetFocusZone() {
   //on fait un reset de la zone du formulaire avec des valeurs par défauts
   CURRENT_ZONE_RECO = {
     id: 0,
-    name: "Reco page",
-    description: "Aperçu de la description de la zone",
+    name: "",
+    description: "",
     zone_apply: [],
     criteres: [
       {
@@ -425,18 +424,20 @@ $(document).on("keyup", ".valeurs", function () {
   }
 });
 
-$(document).on("keyup", ".name-zone-reco", function () {
+$(document).on("keyup", "#name-zone-reco", function () {
   const val = $(this).val();
   CURRENT_ZONE_RECO.name = val;
 });
 
-$(document).on("keyup", ".description-zone-reco", function () {
+$(document).on("keyup", "#description-zone-reco", function () {
   const val = $(this).val();
   CURRENT_ZONE_RECO.description = val;
 });
 
 $(document).on("click", "#save-zone-reco", function (e) {
   e.preventDefault();
+
+  // console.log({ CURRENT_ZONE_RECO });
   if (CURRENT_ZONE_RECO.id == 0) {
     //il faudrait mettre à jour le nouvel id normalement
     const list = [...GLOBAL_CONFIG_RECO["list_my_zone_reco"]];

@@ -431,16 +431,22 @@ $(document).on("keyup", ".description-zone-reco", function () {
   CURRENT_ZONE_RECO.description = val;
 });
 
-$(document).on("click", "#save-zone-reco", function () {
+$(document).on("click", "#save-zone-reco", function (e) {
+  e.preventDefault();
+  console.log({ CURRENT_ZONE_RECO, GLOBAL_CONFIG_RECO });
   if (CURRENT_ZONE_RECO.id == 0) {
     //il faudrait mettre à jour le nouvel id normalement
-    GLOBAL_CONFIG_RECO["list_zone_reco"].push(CURRENT_ZONE_RECO);
+    const list = [...GLOBAL_CONFIG_RECO["list_my_zone_reco"]];
+
+    GLOBAL_CONFIG_RECO["list_my_zone_reco"] = [...list, CURRENT_ZONE_RECO];
+
+    console.log({ GLOBAL_CONFIG_RECO });
   } else {
-    const zoneIndex = GLOBAL_CONFIG_RECO["list_zone_reco"].findIndex(
+    const zoneIndex = GLOBAL_CONFIG_RECO["list_my_zone_reco"].findIndex(
       (zone) => zone.id === CURRENT_ZONE_RECO.id
     );
     if (zoneIndex !== -1) {
-      GLOBAL_CONFIG_RECO["list_zone_reco"][zoneIndex] = CURRENT_ZONE_RECO;
+      GLOBAL_CONFIG_RECO["list_my_zone_reco"][zoneIndex] = CURRENT_ZONE_RECO;
     }
   }
 

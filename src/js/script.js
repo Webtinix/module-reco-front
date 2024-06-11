@@ -366,9 +366,8 @@ $(document).on("change", ".isActiveBlock_", function () {
   const isChecked = $(this).is(":checked");
 
   // Mettre à jour l'état activé du critère dans la configuration actuelle
-  const critere = CURRENT_ZONE_RECO["criteres"].find(
-    (crit) => crit.id == index
-  );
+  const critere = CURRENT_ZONE_RECO["criteres"][index];
+
   if (critere) {
     critere.enabled = isChecked;
   }
@@ -461,7 +460,7 @@ function blockCritereZoneReco(data, count, index) {
   const btnMoinsIsVisible = count > 1 ? "" : "hidden";
 
   const critere = `
-   <div class="block-critere-zone-reco grid grid-cols-12 items-center" critere-index="${id}">
+   <div class="block-critere-zone-reco grid grid-cols-12 items-center" critere-index="${index}">
         <div class="col-span-4 flex gap-8 items-center w-full">
             <div class="flex flex-col gap-4">
                 <button 

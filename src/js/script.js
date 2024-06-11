@@ -315,6 +315,26 @@ $(document).on("click", ".item-zone-apply", function () {
   });
 });
 
+$(document).on("change", ".select-critere", function () {
+  //event pour le select des zones applicables
+
+  const selectedValue = $(this).val(); //event.target.value;
+  const index = $(this).attr("critere-index");
+  const dataBlocCritere = CURRENT_ZONE_RECO["criteres"][index] ?? {
+    critere_value: selectedValue,
+    enabled: true,
+  };
+  const dataDiluer = {
+    ...dataBlocCritere,
+    critere_value: selectedValue,
+  };
+  const newDynamiqueBlock = blockDynamique(dataDiluer);
+  const parents = $(this).parents(".block-critere-zone-reco");
+  parents.find(".dynamiqueBlock")?.empty();
+  parents.find(".dynamiqueBlock")?.append(newDynamiqueBlock);
+  CURRENT_ZONE_RECO["criteres"][index] = dataDiluer;
+});
+
 $(document).on("change", "#select-page-apply", function () {
   //event pour le select des zones applicables
   const value = $(this).val();
@@ -555,7 +575,7 @@ function blockDynamique(data) {
       <div class="items-center grid grid-cols-8">
        <label class="inline-flex items-center mb-5 cursor-pointer">
           <input type="checkbox" value="" name=""
-              class=" sr-only peer" ${value ? "checked" : ""} >
+              class=" sr-only peer" ${valeurs ? "checked" : ""} >
           <div
               class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300  rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-blue-600">
           </div>
